@@ -1,0 +1,33 @@
+{% extends 'backend/base.html' %}
+
+{% block title %} Edit Product {% endblock %}
+
+{% block content %}
+
+{% if messages %}
+{% for message in messages %}
+<div class="container">
+    <div class="row py-3 justify-content-center">
+        <div class="col">
+            <div class="alert alert-{{message.tags}}" role="alert">
+                 {{message}}
+              </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Edit Product</h1>
+    <a href="{% url 'product:list.product' %}" class="float-right btn btn-primary">All Product</a>
+</div>
+
+
+<div id="app">
+    {% csrf_token %}
+    <edit-product :has_variant="{{has_variant|safe}}" :variants="{{variants|safe}}"></edit-product>
+</div>
+{{ object.id|json_script:"product_id" }}
+
+{% endblock %}

@@ -35,12 +35,13 @@
             <h6 class="m-0 font-weight-bold text-primary">Variants</h6>
           </div>
           <div class="card-body">
-            <div class="row" v-for="(item,index) in product_variant">
+            <div class="row" v-for="(item,index) in product_variant" :key="index" >
               <div class="col-md-4">
                 <div class="form-group">
                   <label for="">Option</label>
                   <select v-model="item.option" class="form-control">
                     <option v-for="variant in variants"
+                            :key="variant.id"
                             :value="variant.id">
                       {{ variant.title }}
                     </option>
@@ -74,7 +75,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="variant_price in product_variant_prices">
+                <tr v-for="variant_price in product_variant_prices" :key="variant_price.id" >
                   <td>{{ variant_price.title }}</td>
                   <td>
                     <input type="text" class="form-control" v-model="variant_price.price">
@@ -178,6 +179,22 @@ export default {
       return ans;
     },
 
+    // Get csrf token
+    getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    },
+
     // store product into database
     saveProduct() {
       let product = {
@@ -189,10 +206,30 @@ export default {
         product_variant_prices: this.product_variant_prices
       }
 
-
-      axios.post('/product', product).then(response => {
-        console.log(response.data);
-      }).catch(error => {
+      const csrftoken = this.getCookie('csrftoken');
+      
+      let url = '/product/create-new-product/';
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrftoken,
+        },
+        body: JSON.stringify(product)
+      })
+      .then(response => {
+        return response.json();
+      })
+      .then(data => {
+        const domain = location.protocol + location.host;
+        if(data.success) {
+          window.location.reload();
+        }
+        else {
+          alert(JSON.stringify(data));
+        }
+      })
+      .catch(error => {
         console.log(error);
       })
 

@@ -3,6 +3,19 @@
 {% block title %} Create Product {% endblock %}
 
 {% block content %}
+{% if messages %}
+{% for message in messages %}
+<div class="container">
+    <div class="row py-3 justify-content-center">
+        <div class="col">
+            <div class="alert alert-{{message.tags}}" role="alert">
+                 {{message}}
+              </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Create Product</h1>
     <a href="{% url 'product:create.product' %}" class="float-right btn btn-primary">All Product</a>

@@ -17,8 +17,15 @@
             </div>
             <div class="col-md-2">
                 <select name="variant" id="" class="form-control">
-                    <option selected disabled>--Select A Variant--</option>
 
+                    <option selected disabled>--Select A Variant--</option>
+                    {% for variant in variants %}
+                    <option class="font-weight-bold" disabled value="{{variant.variant.title}}">{{variant.variant.title|title}}</option>
+                    <hr>
+                    {% for attribute in variant.attributes %}
+                    <option value="{{attribute}}">{{attribute}}</option>
+                    {% endfor %}
+                    {% endfor %}
                 </select>
             </div>
 
@@ -55,58 +62,47 @@
                 </thead>
 
                 <tbody>
+                    {% for product in products %}
                 <tr>
-                    <td>1</td>
-                    <td>T-Shirt <br> Created at : 25-Aug-2020</td>
-                    <td>Quality product in low cost</td>
+                    <td>{{forloop.counter}}</td>
+                    <td>{{product.title}} <br> Created at : {{product.created_at|date:"d-M-Y"}}</td>
+                    <td>{{product.description}}</td>
                     <td>
-                        <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant">
+                        {% if product.variations.count > 0 %}
+                        <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant{{product.id}}">
+                            {% for variation in product.variations %}
                                 <dt class="col-sm-3 pb-0">
-                                    XL/ Black/ Full
+                                    {% if variation.product_variant_one %}
+                                    {{variation.product_variant_one}}/
+                                    {% endif %}
+                                    {% if variation.product_variant_two %}
+                                    {{variation.product_variant_two}}/
+                                    {% endif %}
+                                    {% if variation.product_variant_three %}
+                                    {{variation.product_variant_three}}/
+                                    {% endif %}
                                 </dt>
                                 <dd class="col-sm-9">
                                     <dl class="row mb-0">
-                                        <dd class="col-sm-4 pb-0">Price : 200.0</dd>
-                                        <dd class="col-sm-8 pb-0">InStock : 50.</dd>
+                                        <dd class="col-sm-4 pb-0">Price : {{variation.price}}</dd>
+                                        <dd class="col-sm-8 pb-0">InStock : {{variation.stock}}.</dd>
                                     </dl>
                                 </dd>
-                                <dt class="col-sm-3 pb-0">
-                                    XL/ Black/ Half
-                                </dt>
-                                <dd class="col-sm-9">
-                                    <dl class="row mb-0">
-                                        <dd class="col-sm-4 pb-0">Price : 200.0</dd>
-                                        <dd class="col-sm-8 pb-0">InStock : 50.</dd>
-                                    </dl>
-                                </dd>
-                                <dt class="col-sm-3 pb-0">
-                                    L/ Black/ Full
-                                </dt>
-                                <dd class="col-sm-9">
-                                    <dl class="row mb-0">
-                                        <dd class="col-sm-4 pb-0">Price : 200.0</dd>
-                                        <dd class="col-sm-8 pb-0">InStock : 50.</dd>
-                                    </dl>
-                                </dd>
-                                <dt class="col-sm-3 pb-0">
-                                    L/ Black/ Half
-                                </dt>
-                                <dd class="col-sm-9">
-                                    <dl class="row mb-0">
-                                        <dd class="col-sm-4 pb-0">Price : 200.0</dd>
-                                        <dd class="col-sm-8 pb-0">InStock : 50.</dd>
-                                    </dl>
-                                </dd>
+                                {% endfor %}
                             </dl>
-                        <button onclick="$('#variant').toggleClass('h-auto')" class="btn btn-sm btn-link">Show more
+                        <button onclick="$('#variant{{product.id}}').toggleClass('h-auto')" class="btn btn-sm btn-link">Show more
                         </button>
+                        {% else %}
+                        <span>No variant added</span>
+                        {% endif %}
                     </td>
                     <td>
                         <div class="btn-group btn-group-sm">
-                            <a href="" class="btn btn-success">Edit</a>
+                            <a href="{% url 'product:edit.product' product.pk %}" class="btn btn-success">Edit</a>
                         </div>
                     </td>
                 </tr>
+                {% endfor %}
                 </tbody>
 
             </table>
@@ -117,10 +113,10 @@
     <div class="card-footer">
         <div class="row justify-content-between">
             <div class="col-md-6">
-                <p>Showing 1 to 10 out of 100</p>
+                <p>Showing {{ queryset.start_index }} to {{ queryset.end_index}} out of {{ paginator.object_list.count }}</p>
             </div>
             <div class="col-md-2">
-
+                    {% include './pagination.html' %}
             </div>
         </div>
     </div>
